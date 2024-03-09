@@ -169,10 +169,10 @@ local entry = function()
 
 		-- 获取输入
 		local key = ya.which({ cands = cands, silent = true })
-		local action = key_to_action[key]
+		local key_action = key_to_action[key]
 
 		-- 根据键入的动作调整光标位置或窗口显示范围
-		if action == "next" then
+		if key_action == "next" then
 			-- 在边界之前光标可以向下
 			-- 或者滑窗到底了也允许光标向下
 			if window_cursor < (window_height - scroll_offset) or action_window_end == #action_list then
@@ -188,7 +188,7 @@ local entry = function()
 			end
 		-- 在边界之前光标可以向上
 		-- 或者滑窗到顶了也允许光标向上
-		elseif action == "prev" then
+		elseif key_action == "prev" then
 			if window_cursor > (1 + scroll_offset) or action_window_start == 1 then
 				-- 保证不出边界
 				window_cursor = math.max(window_cursor - 1, 1)
@@ -200,19 +200,17 @@ local entry = function()
 				action_window_end = action_window_end - 1
 				cursor = cursor - 1
 			end
-		elseif action == "last" then
-			-- 跳转到底部
+		elseif key_action == "last" then -- 跳转到底部
 			window_cursor = window_height
 			action_window_start = #action_list - window_height + 1
 			action_window_end = #action_list
 			cursor = #action_list
-		elseif action == "first" then
-			-- 跳转到顶部
+		elseif key_action == "first" then -- 跳转到顶部
 			window_cursor = 1
 			action_window_start = 1
 			action_window_end = window_height
 			cursor = 1
-		elseif action == "confirm" then
+		elseif key_action == "confirm" then -- 确认
 			-- 取消选择
 			ya.manager_emit("select_all", { state = "false" })
 			-- 恢复界面
@@ -225,7 +223,7 @@ local entry = function()
 				selected = sync_state.selected_files,
 			})
 			break
-		elseif action == "cancel" or action == nil then
+		elseif key_action == "cancel" or key_action == nil then
 			-- 如果是取消或其他输入，恢复界面
 			draw_popup(false)
 			break
