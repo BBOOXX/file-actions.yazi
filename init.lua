@@ -118,8 +118,9 @@ local entry = function()
 	local sync_state = miscellaneous()
 	-- 获取动作列表
 	-- stylua: ignore
-	local action_child = Command("ls")
-		:arg(ya.quote(sync_state.actions_path))
+	local action_child = Command("sh")
+		:cwd(ya.quote(sync_state.actions_path))
+		:args({"-c","ls -d */" })
 		:stdout(Command.PIPED)
 		:spawn()
 
@@ -127,7 +128,7 @@ local entry = function()
 	while true do
 		local line, event = action_child:read_line()
 		if event == 0 then
-			local action_name = string.gsub(line, "%s$", "")
+			local action_name = string.gsub(line, "/%s$", "")
 			table.insert(action_list, action_name)
 		elseif event == 2 then
 			break
