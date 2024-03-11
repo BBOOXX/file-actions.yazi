@@ -183,6 +183,7 @@ local entry = function(_, args)
 		local key = ya.which({ cands = cands, silent = true })
 		local key_action = key_to_action[key]
 
+		::handle_key_action::
 		-- 根据键入的动作调整光标位置或窗口显示范围
 		if key_action == "next" then
 			-- 在边界之前光标可以向下
@@ -190,10 +191,8 @@ local entry = function(_, args)
 			if window_cursor < (window_height - scroll_offset) or action_window_end == #action_list then
 				-- 环绕模式
 				if flags.around and window_cursor == window_height then
-					window_cursor = 1
-					action_window_start = 1
-					action_window_end = window_height
-					cursor = 1
+					key_action = "first" -- 跳转到顶部
+					goto handle_key_action
 				else
 					-- 保证不出边界
 					window_cursor = math.min(window_cursor + 1, window_height)
@@ -212,10 +211,8 @@ local entry = function(_, args)
 			if window_cursor > (1 + scroll_offset) or action_window_start == 1 then
 				-- 环绕模式
 				if flags.around and window_cursor == 1 then
-					window_cursor = window_height
-					action_window_start = #action_list - window_height + 1
-					action_window_end = #action_list
-					cursor = #action_list
+					key_action = "last" -- 跳转到底部
+					goto handle_key_action
 				else
 					-- 保证不出边界
 					window_cursor = math.max(window_cursor - 1, 1)
