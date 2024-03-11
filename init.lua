@@ -1,6 +1,8 @@
 local cands = {
 	{ on = "j", desc = "下一项" },
+	{ on = "<Down>", desc = "下一项" },
 	{ on = "k", desc = "上一项" },
+	{ on = "<Up>", desc = "上一项" },
 	{ on = "G", desc = "最后一项" },
 	{ on = "g", desc = "第一项" },
 	{ on = "<Esc>", desc = "取消" },
@@ -9,11 +11,13 @@ local cands = {
 
 local key_to_action = {
 	[1] = "next", -- on = "j"
-	[2] = "prev", -- on = "k"
-	[3] = "last", -- on = "G"
-	[4] = "first", -- on = "gg"
-	[5] = "cancel", -- on = "<Esc>"
-	[6] = "confirm", -- on = "<Enter>"
+	[2] = "next", -- on = "<Down>"
+	[3] = "prev", -- on = "k"
+	[4] = "prev", -- on = "<up>"
+	[5] = "last", -- on = "G"
+	[6] = "first", -- on = "gg"
+	[7] = "cancel", -- on = "<Esc>"
+	[8] = "confirm", -- on = "<Enter>"
 }
 
 -- 设定滚动偏移量，即光标上下的保留行数
