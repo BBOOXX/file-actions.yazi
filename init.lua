@@ -118,7 +118,14 @@ local draw_popup = ya.sync(function(state, display, height, iterms, cursor)
 	ya.render()
 end)
 
-local entry = function()
+local entry = function(_, args)
+	local flags = { around = false }
+	for _, arg in pairs(args) do
+		if flags[arg] ~= nil then
+			flags[arg] = true
+		end
+	end
+
 	local sync_state = miscellaneous()
 	-- 获取动作列表
 	-- stylua: ignore
@@ -181,10 +188,18 @@ local entry = function()
 			-- 在边界之前光标可以向下
 			-- 或者滑窗到底了也允许光标向下
 			if window_cursor < (window_height - scroll_offset) or action_window_end == #action_list then
-				-- 保证不出边界
-				window_cursor = math.min(window_cursor + 1, window_height)
-				cursor = math.min(cursor + 1, #action_list)
-			-- 到达边界则滚动内容
+				-- 环绕模式
+				if flags.around and window_cursor == window_height then
+					window_cursor = 1
+					action_window_start = 1
+					action_window_end = window_height
+					cursor = 1
+				else
+					-- 保证不出边界
+					window_cursor = math.min(window_cursor + 1, window_height)
+					cursor = math.min(cursor + 1, #action_list)
+				end
+			-- 到达边界则滚动内容 (调整滑窗)
 			-- 滚到底会移动光标不用担心窗口继续滑动
 			elseif window_cursor == (window_height - scroll_offset) then
 				action_window_start = action_window_start + 1
@@ -195,10 +210,18 @@ local entry = function()
 		-- 或者滑窗到顶了也允许光标向上
 		elseif key_action == "prev" then
 			if window_cursor > (1 + scroll_offset) or action_window_start == 1 then
-				-- 保证不出边界
-				window_cursor = math.max(window_cursor - 1, 1)
-				cursor = math.max(cursor - 1, 1)
-			-- 到达边界则滚动内容
+				-- 环绕模式
+				if flags.around and window_cursor == 1 then
+					window_cursor = window_height
+					action_window_start = #action_list - window_height + 1
+					action_window_end = #action_list
+					cursor = #action_list
+				else
+					-- 保证不出边界
+					window_cursor = math.max(window_cursor - 1, 1)
+					cursor = math.max(cursor - 1, 1)
+				end
+			-- 到达边界则滚动内容 (调整滑窗)
 			-- 滚到底会移动光标不用担心窗口继续滑动
 			elseif window_cursor == (1 + scroll_offset) then
 				action_window_start = action_window_start - 1
