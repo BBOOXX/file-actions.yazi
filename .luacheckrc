@@ -1,20 +1,21 @@
 stds.yazi = {
 	globals = {
 		"Manager",
+		"Popup",
 	},
 	read_globals = {
-		"ya",
-		"fs",
-        "Command",
-        "Child",
-		"cx",
-		"ui",
-		"Url",
 		"BOOT",
 		"MANAGER",
-		"THEME",
 		"PREVIEW",
+		"THEME",
+		"Url",
 		"YAZI_PLUGIN_NAME",
+		"cx",
+		"fs",
+		"ui",
+		"ya",
+		"Child",
+		"Command",
 	},
 }
 std = "max+yazi"
