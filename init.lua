@@ -246,19 +246,22 @@ local entry = function(_, args)
 		:stdout(Command.PIPED)
 		:spawn()
 
-	local action_list = {}
+	local action_paths = {}
+	local action_names = {}
 	while true do
 		local line, event = action_child:read_line()
 		if event == 0 then
-			local action_name = string.gsub(line, "/%s$", "")
-			table.insert(action_list, action_name)
+			local action_path = string.gsub(line, "/%s$", "")
+			local action_config = dofile(string.format("%s/%s/info.lua", sync_state.actions_path, action_path))
+			table.insert(action_names, action_config.name)
+			table.insert(action_paths, action_path)
 		elseif event == 2 then
 			break
 		end
 	end
 
 	-- 动作列表是空的
-	if #action_list == 0 then
+	if #action_paths == 0 then
 		ya.err("啥都没有")
 		--ya.manager_emit("select_all", { state = "false" })
 		return
@@ -273,14 +276,14 @@ local entry = function(_, args)
 	local onConfirm = function(cursor)
 		ya.manager_emit("select_all", { state = "false" }) -- 取消选择
 		-- 纸糊的部分
-		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path,action_list[cursor]))
+		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path,action_paths[cursor]))
 		mod:init({
-			workpath = sync_state.actions_path .. "/" .. action_list[cursor],
+			workpath = sync_state.actions_path .. "/" .. action_paths[cursor],
 			selected = sync_state.selected_files,
 		})
 	end
 
-	local menu = Popup.Menu:new(action_list, flags.around, onConfirm)
+	local menu = Popup.Menu:new(action_names, flags.around, onConfirm)
 	menu:show()
 end
 
