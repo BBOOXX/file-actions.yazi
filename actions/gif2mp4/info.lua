@@ -1,8 +1,8 @@
 local config = {
 	name = "GIF to MP4",
-	mime = {
+	enableMimes = {
 		"image/gif",
-	}
+	},
 }
 
 return config

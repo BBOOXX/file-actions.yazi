@@ -238,6 +238,33 @@ local entry = function(_, args)
 	end
 
 	local sync_state = miscellaneous()
+
+	-- 选择的文件数量
+	if #sync_state.selected_files == 0 then
+		ya.err("啥也没选")
+		return
+	end
+
+	-- 获取文件 MIME
+	local selected_mimetype_set = {}
+	-- stylua: ignore
+	local file_child = Command("file")
+		:args({ "-bL", "--mime-type" })
+		:args(sync_state.selected_files)
+		:stdout(Command.PIPED)
+		:spawn()
+
+	while true do
+		local line, event = file_child:read_line()
+		if event == 0 then
+			local mimetype = string.gsub(line, "%s$", "")
+			selected_mimetype_set[mimetype] = true
+		elseif event == 2 then
+			break
+		end
+	end
+
+
 	-- 获取动作列表
 	-- stylua: ignore
 	local action_child = Command("sh")
@@ -252,12 +279,38 @@ local entry = function(_, args)
 		local line, event = action_child:read_line()
 		if event == 0 then
 			local action_path = string.gsub(line, "/%s$", "")
+			-- 加载动作脚本的配置信息
 			local action_config = dofile(string.format("%s/%s/info.lua", sync_state.actions_path, action_path))
+			-- 检查是否有不允许的MIME类型
+			if action_config.disableMimes ~= nil then
+				for _, mimetype in pairs(action_config.disableMimes) do
+					if selected_mimetype_set[mimetype] then
+						-- 直接跳过
+						goto continue_get_action
+					end
+				end
+			end
+			-- 检查是否有允许的MIME类型列表 有并且不是空的
+			if action_config.enableMimes ~= nil and #action_config.enableMimes ~= 0 then
+				-- 将允许表转换为集合便于快速查找
+				local enableMimes_set = {}
+				for _, mimetype in pairs(action_config.enableMimes) do
+					enableMimes_set[mimetype] = true
+				end
+				for selected_mimetype in pairs(selected_mimetype_set) do
+					-- 如果有不允许的MIME
+					if not enableMimes_set[selected_mimetype] then
+						goto continue_get_action
+					end
+				end
+			end
+			-- 没有允许的MIME类型列表, 默认直接添加
 			table.insert(action_names, action_config.name)
 			table.insert(action_paths, action_path)
 		elseif event == 2 then
 			break
 		end
+		::continue_get_action::
 	end
 
 	-- 动作列表是空的
@@ -267,16 +320,10 @@ local entry = function(_, args)
 		return
 	end
 
-	-- 选择的文件数量
-	if #sync_state.selected_files == 0 then
-		ya.err("啥也没选")
-		return
-	end
-
 	local onConfirm = function(cursor)
 		ya.manager_emit("select_all", { state = "false" }) -- 取消选择
 		-- 纸糊的部分
-		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path,action_paths[cursor]))
+		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path, action_paths[cursor]))
 		mod:init({
 			workpath = sync_state.actions_path .. "/" .. action_paths[cursor],
 			selected = sync_state.selected_files,
