@@ -1,6 +1,7 @@
 stds.yazi = {
 	globals = {
 		"Manager",
+		"Popup"
 	},
 	read_globals = {
 		"ya",

@@ -273,8 +273,7 @@ local entry = function(_, args)
 	local onConfirm = function(cursor)
 		ya.manager_emit("select_all", { state = "false" }) -- 取消选择
 		-- 纸糊的部分
-		package.path = sync_state.actions_path .. "/?/init.lua;" .. package.path
-		local mod = require(action_list[cursor])
+		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path,action_list[cursor]))
 		mod:init({
 			workpath = sync_state.actions_path .. "/" .. action_list[cursor],
 			selected = sync_state.selected_files,
