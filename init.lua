@@ -122,7 +122,7 @@ function Popup.Menu.render(area, items, cursor)
 	}
 end
 
-Popup.draw_popup = ya.sync(function(state, display, height, items, cursor)
+Popup.Menu.draw_popup = ya.sync(function(state, display, height, items, cursor)
 	-- 绘制窗口
 	-- state : 装着咕噜的宝贝
 	-- display : 绘制窗口吗？
@@ -152,7 +152,7 @@ function Popup.Menu:show()
 	local cursor = 1
 	while true do
 		-- 绘制窗口
-		Popup.draw_popup(
+		Popup.Menu.draw_popup(
 			true,
 			window_height,
 			{ table.unpack(self.item_list, window_start, window_end) },
@@ -217,13 +217,13 @@ function Popup.Menu:show()
 			cursor = 1
 		elseif key_action == "confirm" then -- 确认
 			-- 恢复界面
-			Popup.draw_popup(false)
+			Popup.Menu.draw_popup(false)
 			self.onConfirm(cursor)
 			break
 		elseif key_action == "cancel" or key_action == nil then
 			-- 取消或为定义的输入
 			self.onCancel()
-			Popup.draw_popup(false)
+			Popup.Menu.draw_popup(false)
 			break
 		end
 	end
