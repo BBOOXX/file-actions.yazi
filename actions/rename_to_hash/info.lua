@@ -1,7 +1,7 @@
 local config = {
-	name = "Rename to Hash",
+	name = "Rename to Md5",
 	disableMimes = {
-		"inode/directory",
+		"inode/directory",  -- 忽略文件夹
 	},
 }
 
