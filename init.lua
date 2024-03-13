@@ -56,6 +56,10 @@ local miscellaneous = ya.sync(function(state)
 	local result = {}
 	-- 已选择的文件
 	result.selected_files = {}
+	result.cursor_files = {}
+	if not cx.active.current.hovered.url.is_archive then
+		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
+	end
 	for _, url in pairs(cx.active.selected) do
 		table.insert(result.selected_files, tostring(url))
 	end
@@ -142,10 +146,10 @@ end)
 function Popup.Menu:show()
 	-- 显示范围 开始
 	local window_start = 1
-	-- 显示范围 结束 项目少就不用那么大窗口
-	local window_end = math.min(self.window_size, #self.item_list)
 	-- 窗口高度
-	local window_height = window_end
+	local window_height = math.min(self.window_size, #self.item_list)
+	-- 显示范围 结束 项目少就不用那么大窗口
+	local window_end = window_height
 	-- 当前光标在窗口内的位置
 	local window_cursor = 1
 	-- 光标实际位置
@@ -239,10 +243,9 @@ local entry = function(_, args)
 
 	local sync_state = miscellaneous()
 
-	-- 选择的文件数量
+	-- 没选择文件 使用当前光标下的文件
 	if #sync_state.selected_files == 0 then
-		ya.err("啥也没选")
-		return
+		sync_state.selected_files = sync_state.cursor_files
 	end
 
 	-- 获取文件 MIME
@@ -315,7 +318,12 @@ local entry = function(_, args)
 
 	-- 动作列表是空的
 	if #action_paths == 0 then
-		ya.err("啥都没有")
+		ya.notify({
+			title = "Action Script Not Found ",
+			content = "No action script available for this file type.",
+			timeout = 6.0,
+			 level = "warn",
+		})
 		--ya.manager_emit("select_all", { state = "false" })
 		return
 	end

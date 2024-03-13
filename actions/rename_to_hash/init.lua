@@ -1,19 +1,17 @@
 local M = {}
 
 function M.init(_, opts)
-	--脚本这里没有"./"不行
-	--脚本文件要有执行权限
-	local action_child = Command("./md5name.sh")
-		:cwd(opts.workpath) -- 进入动作插件目录
-		--为了避免文件名中空格带来的问题这里使用 Tab 分割
-		--所以脚本文件中要声明 IFS=$'\t'
+	-- The script here won't work without "./"
+	-- The script file must have execution permissions
+	local output, err = Command("./md5name.sh")
+		:cwd(opts.workpath) -- Enter the directory of the action plugin
+		-- To avoid issues with spaces in filenames, here we use Tab to separate
+		-- Therefore, in the script file, it must declare IFS=$'\t'
 		:env("selection", table.concat(opts.selected, "\t"))
-		:stdout(Command.PIPED)
-		:stderr(Command.PIPED)
-		:spawn()
+		:output()
 
-	-- TODO
-	local status, err = action_child:wait()
+	--For detailed usage of the 'output' and 'err' variables,
+	--please refer to: https://yazi-rs.github.io/docs/plugins/utils#output
 end
 
 return M
