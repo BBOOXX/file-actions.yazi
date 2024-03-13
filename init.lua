@@ -322,7 +322,7 @@ local entry = function(_, args)
 			title = "Action Script Not Found ",
 			content = "No action script available for this file type.",
 			timeout = 6.0,
-			 level = "warn",
+			level = "warn",
 		})
 		--ya.manager_emit("select_all", { state = "false" })
 		return
@@ -335,6 +335,7 @@ local entry = function(_, args)
 		mod:init({
 			workpath = sync_state.actions_path .. "/" .. action_paths[cursor],
 			selected = sync_state.selected_files,
+			flags = flags,
 		})
 	end
 
