@@ -56,6 +56,10 @@ local miscellaneous = ya.sync(function(state)
 	local result = {}
 	-- 已选择的文件
 	result.selected_files = {}
+	result.cursor_files = {}
+	if not cx.active.current.hovered.url.is_archive then
+		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
+	end
 	for _, url in pairs(cx.active.selected) do
 		table.insert(result.selected_files, tostring(url))
 	end
@@ -239,10 +243,9 @@ local entry = function(_, args)
 
 	local sync_state = miscellaneous()
 
-	-- 选择的文件数量
+	-- 没选择文件 使用当前光标下的文件
 	if #sync_state.selected_files == 0 then
-		ya.err("啥也没选")
-		return
+		sync_state.selected_files = sync_state.cursor_files
 	end
 
 	-- 获取文件 MIME
