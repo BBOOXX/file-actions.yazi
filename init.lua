@@ -318,7 +318,12 @@ local entry = function(_, args)
 
 	-- 动作列表是空的
 	if #action_paths == 0 then
-		ya.err("啥都没有")
+		ya.notify({
+			title = "Action Script Not Found ",
+			content = "No action script available for this file type.",
+			timeout = 6.0,
+			 level = "warn",
+		})
 		--ya.manager_emit("select_all", { state = "false" })
 		return
 	end
