@@ -142,10 +142,10 @@ end)
 function Popup.Menu:show()
 	-- 显示范围 开始
 	local window_start = 1
-	-- 显示范围 结束 项目少就不用那么大窗口
-	local window_end = math.min(self.window_size, #self.item_list)
 	-- 窗口高度
-	local window_height = window_end
+	local window_height = math.min(self.window_size, #self.item_list)
+	-- 显示范围 结束 项目少就不用那么大窗口
+	local window_end = window_height
 	-- 当前光标在窗口内的位置
 	local window_cursor = 1
 	-- 光标实际位置
