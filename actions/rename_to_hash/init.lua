@@ -1,6 +1,8 @@
 local M = {}
 
+--luacheck: ignore output err
 function M.init(_, opts)
+	-- stylua: ignore
 	-- The script here won't work without "./"
 	-- The script file must have execution permissions
 	local output, err = Command("./md5name.sh")
