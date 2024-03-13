@@ -17,7 +17,7 @@ git clone https://github.com/BBOOXX/file-actions.yazi.git ~/.config/yazi/plugins
 [manager]
 keymap = [
 # ...
-	{ on = [ "f" ], exec = "plugin file-actions", desc= "Perform actions on selected files"},
+	{ on = [ "f" ], exec = "plugin file-actions --args='around '", desc= "Perform actions on selected files"},
 # ...
 ]
 
@@ -34,9 +34,11 @@ Place the action script in the 'actions' directory, and the plugin will automati
 │       └── actions/
 │           ├── action1/
 │           │   ├── init.lua
+│           │   ├── info.lua
 │           │   └── blabla.sh
 │           └── action2/
 │               ├── init.lua
+│               ├── info.lua
 │               └── blabla.sh
 └── yazi.toml
 ```
