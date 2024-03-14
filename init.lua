@@ -54,20 +54,22 @@ local miscellaneous = ya.sync(function(state)
 	end
 
 	local result = {}
-	-- 已选择的文件
-	result.selected_files = {}
+	-- 光标下的文件
 	result.cursor_files = {}
 	local hovered = cx.active.current.hovered
+	-- 空文件夹时 没有光标下的文件
 	if hovered and not hovered.url.is_archive then
 		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
 	end
 
+	-- 已选择的文件
+	result.selected_files = {}
 	for _, url in pairs(cx.active.selected) do
 		if not url.is_archive then
 			table.insert(result.selected_files, tostring(url))
 		end
 	end
-	-- 动作插件路径
+	-- 动作脚本路径
 	result.actions_path = string.format("%s/%s.yazi/actions", BOOT.plugin_dir, YAZI_PLUGIN_NAME)
 	return result
 end)
@@ -113,8 +115,8 @@ function Popup.center_layout(area, height)
 end
 
 function Popup.Menu.render(area, items, cursor)
-	-- area   : rect
-	-- items : 项目
+	-- area : rect
+	-- items : 菜单项目
 	-- cursor : 窗口中光标的位置
 	local list_items = {}
 	for i, item in ipairs(items) do
@@ -135,7 +137,7 @@ Popup.Menu.draw_popup = ya.sync(function(state, display, height, items, cursor)
 	-- state : 装着咕噜的宝贝
 	-- display : 绘制窗口吗？
 	-- height : 窗口高度
-	-- items : 项目
+	-- items : 菜单项目
 	-- cursor : 窗口中光标的位置
 	Manager.render = function(self, area)
 		local renders = { state.old_render(self, area) }
@@ -154,7 +156,7 @@ function Popup.Menu:show()
 	local window_height = math.min(self.window_size, #self.item_list)
 	-- 显示范围 结束 项目少就不用那么大窗口
 	local window_end = window_height
-	-- 当前光标在窗口内的位置
+	-- 光标在窗口内的位置
 	local window_cursor = 1
 	-- 光标实际位置
 	local cursor = 1
@@ -228,16 +230,17 @@ function Popup.Menu:show()
 			Popup.Menu.draw_popup(false)
 			self.onConfirm(cursor)
 			break
-		elseif key_action == "cancel" or key_action == nil then
-			-- 取消或为定义的输入
-			self.onCancel()
+		elseif key_action == "cancel" or key_action == nil then -- 取消或未定义的输入
+			-- 恢复界面
 			Popup.Menu.draw_popup(false)
+			self.onCancel()
 			break
 		end
 	end
 end
 
 local entry = function(_, args)
+	-- 插件参数
 	local flags = { around = false }
 	for _, arg in pairs(args) do
 		if flags[arg] ~= nil then
@@ -247,12 +250,12 @@ local entry = function(_, args)
 
 	local sync_state = miscellaneous()
 
-	-- 空文件夹 并且没选择文件
+	-- 没选择文件 光标下也没文件
 	if #sync_state.cursor_files == 0 and #sync_state.selected_files == 0 then
 		return
 	end
 
-	-- 没选择文件 使用当前光标下的文件
+	-- 没选择文件 使用光标下的文件
 	if #sync_state.selected_files == 0 then
 		sync_state.selected_files = sync_state.cursor_files
 	end
@@ -291,9 +294,9 @@ local entry = function(_, args)
 		local line, event = action_child:read_line()
 		if event == 0 then
 			local action_path = string.gsub(line, "/%s$", "")
-			-- 加载动作脚本的配置信息
+			-- 加载动作脚本配置信息
 			local action_config = dofile(string.format("%s/%s/info.lua", sync_state.actions_path, action_path))
-			-- 检查是否有不允许的MIME类型
+			-- 检查不允许的MIME类型
 			if action_config.disableMimes ~= nil then
 				for _, mimetype in pairs(action_config.disableMimes) do
 					if selected_mimetype_set[mimetype] then
@@ -302,7 +305,7 @@ local entry = function(_, args)
 					end
 				end
 			end
-			-- 检查是否有允许的MIME类型列表 有并且不是空的
+			-- 检查允许的MIME类型列表 有并且不是空的
 			if action_config.enableMimes ~= nil and #action_config.enableMimes ~= 0 then
 				-- 将允许表转换为集合便于快速查找
 				local enableMimes_set = {}
@@ -310,13 +313,13 @@ local entry = function(_, args)
 					enableMimes_set[mimetype] = true
 				end
 				for selected_mimetype in pairs(selected_mimetype_set) do
-					-- 如果有不允许的MIME
+					-- 文件MIME在允许范围外
 					if not enableMimes_set[selected_mimetype] then
 						goto continue_get_action
 					end
 				end
 			end
-			-- 没有允许的MIME类型列表, 默认直接添加
+			-- 没有允许表或所选文件都在允许范围内 直接添加
 			table.insert(action_names, action_config.name)
 			table.insert(action_paths, action_path)
 		elseif event == 2 then
@@ -342,8 +345,11 @@ local entry = function(_, args)
 		-- 纸糊的部分
 		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path, action_paths[cursor]))
 		mod:init({
+			-- 脚本工作目录
 			workpath = sync_state.actions_path .. "/" .. action_paths[cursor],
+			-- 所选文件
 			selected = sync_state.selected_files,
+			-- 插件的参数
 			flags = flags,
 		})
 	end
