@@ -241,7 +241,7 @@ end
 
 local entry = function(_, args)
 	-- 插件参数
-	local flags = { around = false }
+	local flags = { around = false, debug = false }
 	for _, arg in pairs(args) do
 		if flags[arg] ~= nil then
 			flags[arg] = true
