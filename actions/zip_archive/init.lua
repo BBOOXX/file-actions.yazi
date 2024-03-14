@@ -2,7 +2,7 @@ local M = {}
 
 --luacheck: ignore output err
 function M.init(_, opts)
-	-- 判断系统 如果是mac 需要coreutils 因为脚本需要grealpath
+	-- 判断系统 如果是mac 需要 coreutils 因为脚本需要 grealpath
 	local output, err = Command("uname"):arg("-s"):output()
 	local OS = string.gsub(tostring(output.stdout), "%s$", "")
 	if OS == "Darwin" then
@@ -46,8 +46,10 @@ function M.init(_, opts)
 
 	-- stylua: ignore
 	if cancel then return end
+
 	-- The script here won't work without "./"
 	-- The script file must have execution permissions
+	-- stylua: ignore
 	output, err = Command("./ziparchive.sh")
 		:cwd(opts.workpath) -- Enter the directory of the action plugin
 		:env("choice_mode", choice_mode)
@@ -57,14 +59,16 @@ function M.init(_, opts)
 		:env("selection", table.concat(opts.selected, "\t"))
 		:output()
 
-	ya.err("====debug info====")
-	if err ~= nil then
-		ya.err("err:" .. tostring(err))
-	else
-		ya.err("OK? :" .. tostring(output.status:success()))
-		ya.err("Code:" .. tostring(output.status:code()))
-		ya.err("stdout:" .. output.stdout)
-		ya.err("stderr" .. output.stderr)
+	if opts.flags.debug then
+		ya.err("====debug info====")
+		if err ~= nil then
+			ya.err("err:" .. tostring(err))
+		else
+			ya.err("OK? :" .. tostring(output.status:success()))
+			ya.err("Code:" .. tostring(output.status:code()))
+			ya.err("stdout:" .. output.stdout)
+			ya.err("stderr" .. output.stderr)
+		end
 	end
 	--For detailed usage of the 'output' and 'err' variables,
 	--please refer to: https://yazi-rs.github.io/docs/plugins/utils#output
