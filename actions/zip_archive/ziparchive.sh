@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 IFS=$'\t'
+OS="$(uname -s)"
 
 # 变成数组
 arrSelection=(${selection})
@@ -12,7 +13,11 @@ parentPath=${arrSelection[0]%/*}
 parentName=${parentPath##*/}
 
 # 处理相对路径
-relativePath=$(grealpath --relative-to="${parentPath}" ${selection})
+case "$OS" in
+	Darwin) relativePath=$(grealpath --relative-to="${parentPath}" ${selection}) ;;
+	Linux) relativePath=$(realpath --relative-to="${parentPath}" ${selection}) ;;
+	*) echo "Unsupported operating system"; exit 1 ;;
+esac
 
 # 进入工作目录
 cd ${parentPath}

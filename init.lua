@@ -57,9 +57,11 @@ local miscellaneous = ya.sync(function(state)
 	-- 已选择的文件
 	result.selected_files = {}
 	result.cursor_files = {}
-	if not cx.active.current.hovered.url.is_archive then
+	local hovered = cx.active.current.hovered
+	if hovered and not hovered.url.is_archive then
 		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
 	end
+
 	for _, url in pairs(cx.active.selected) do
 		if not url.is_archive then
 			table.insert(result.selected_files, tostring(url))
@@ -244,6 +246,11 @@ local entry = function(_, args)
 	end
 
 	local sync_state = miscellaneous()
+
+	-- 空文件夹 并且没选择文件
+	if #sync_state.cursor_files == 0 and #sync_state.selected_files == 0 then
+		return
+	end
 
 	-- 没选择文件 使用当前光标下的文件
 	if #sync_state.selected_files == 0 then
