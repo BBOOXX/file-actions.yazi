@@ -24,14 +24,16 @@ function M.init(_, opts)
 		:env("selection", table.concat(opts.selected, "\t"))
 		:output()
 
-	ya.err("====debug info====")
-	if err ~= nil then
-		ya.err("err:" .. tostring(err))
-	else
-		ya.err("OK? :" .. tostring(output.status:success()))
-		ya.err("Code:" .. tostring(output.status:code()))
-		ya.err("stdout:" .. output.stdout)
-		ya.err("stderr" .. output.stderr)
+	if opts.flags.debug then
+		ya.err("====debug info====")
+		if err ~= nil then
+			ya.err("err:" .. tostring(err))
+		else
+			ya.err("OK? :" .. tostring(output.status:success()))
+			ya.err("Code:" .. tostring(output.status:code()))
+			ya.err("stdout:" .. output.stdout)
+			ya.err("stderr" .. output.stderr)
+		end
 	end
 
 	--For detailed usage of the 'output' and 'err' variables,
