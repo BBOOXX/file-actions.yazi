@@ -61,7 +61,9 @@ local miscellaneous = ya.sync(function(state)
 		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
 	end
 	for _, url in pairs(cx.active.selected) do
-		table.insert(result.selected_files, tostring(url))
+		if not url.is_archive then
+			table.insert(result.selected_files, tostring(url))
+		end
 	end
 	-- 动作插件路径
 	result.actions_path = string.format("%s/%s.yazi/actions", BOOT.plugin_dir, YAZI_PLUGIN_NAME)
@@ -322,7 +324,7 @@ local entry = function(_, args)
 			title = "Action Script Not Found ",
 			content = "No action script available for this file type.",
 			timeout = 6.0,
-			 level = "warn",
+			level = "warn",
 		})
 		--ya.manager_emit("select_all", { state = "false" })
 		return
@@ -335,6 +337,7 @@ local entry = function(_, args)
 		mod:init({
 			workpath = sync_state.actions_path .. "/" .. action_paths[cursor],
 			selected = sync_state.selected_files,
+			flags = flags,
 		})
 	end
 
