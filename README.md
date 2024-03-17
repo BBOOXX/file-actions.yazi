@@ -74,6 +74,29 @@ end
 return M
 ```
 
+### Execution Script Example
+
+```bash
+#!/usr/bin/env bash
+set -e
+IFS=$'\t'
+# Setting the Internal Field Separator (IFS) to a tab character to handle file names with spaces.
+
+OS="$(uname -s)"
+case "$OS" in
+	Darwin) echo "Mac" ;;
+	Linux) echo "Linux" ;;
+	*) echo "Unsupported operating system"; exit 1 ;;
+esac
+
+# Loop through the list of selected files.
+for file in ${selection}; do
+	echo "$file" 
+done
+```
+
+This script is a basic template and should be modified according to the specific needs of your action scripts. Make sure to test the script in your environment before using it in production.
+
 ### Directory Structure
 ```
 ~/.config/yazi/
