@@ -14,8 +14,17 @@ git clone https://github.com/BBOOXX/file-actions.yazi.git ~/.config/yazi/plugins
 ## Configuration
 ```toml
 # keymap.toml
+[[manager.prepend_keymap]]
+on = [ "f" ]
+exec = "plugin file-actions --args='around '"
+desc= "Perform actions on selected files"
+```
+
+Or in another different style:
+```toml
+# keymap.toml
 [manager]
-keymap = [
+prepend_keymap = [
 # ...
 	{ on = [ "f" ], exec = "plugin file-actions --args='around '", desc= "Perform actions on selected files"},
 # ...
