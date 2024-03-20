@@ -46,6 +46,7 @@ local config = {
 	name = "Script Name",       -- Name of the script
 	enableMimes = {},           -- Supported file mimes by the script
 	disableMimes = {},          -- Unsupported file mimes by the script
+	single_or_multi = "",       -- Script to support either "single" or "multi" file, or both.
 }
 return config
 ```
