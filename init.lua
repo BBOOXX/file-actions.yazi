@@ -296,6 +296,14 @@ local entry = function(_, args)
 			local action_path = string.gsub(line, "/%s$", "")
 			-- 加载动作脚本配置信息
 			local action_config = dofile(string.format("%s/%s/info.lua", sync_state.actions_path, action_path))
+			-- 单一文件
+			if action_config.single_or_multi == "single" and #sync_state.selected_files ~= 1 then
+				goto continue_get_action
+			end
+			-- 多个文件
+			if action_config.single_or_multi == "multi" and #sync_state.selected_files == 1 then
+				goto continue_get_action
+			end
 			-- 检查不允许的MIME类型
 			if action_config.disableMimes ~= nil then
 				for _, mimetype in pairs(action_config.disableMimes) do
