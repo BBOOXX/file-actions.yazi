@@ -43,10 +43,10 @@ To set up an action script, create a new folder within the actions directory, en
 The `info.lua` file describes the action script. Here’s the basic format:
 ```lua
 local config = {
-	name = "Script Name",       -- Name of the script
-	enableMimes = {},           -- Supported file mimes by the script
-	disableMimes = {},          -- Unsupported file mimes by the script
-	single_or_multi = "",       -- Script to support either "single" or "multi" file, or both.
+	name = "Script Name",   -- Name of the script
+	enableMimes = {},       -- Supported file mimes by the script
+	disableMimes = {},      -- Unsupported file mimes by the script
+	single_or_multi = "",   -- Script to support either "single" or "multi" file, or both.
 }
 return config
 ```
