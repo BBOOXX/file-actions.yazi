@@ -349,8 +349,7 @@ local entry = function(_, args)
 	end
 
 	local onConfirm = function(cursor)
-		ya.manager_emit("select_all", { state = "false" }) -- 取消选择
-		-- 纸糊的部分
+		--ya.manager_emit("select_all", { state = "false" }) -- 取消选择
 		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path, action_paths[cursor]))
 		mod:init({
 			-- 脚本工作目录
