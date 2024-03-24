@@ -70,7 +70,8 @@ local miscellaneous = ya.sync(function(state)
 		end
 	end
 	-- 动作脚本路径
-	result.actions_path = string.format("%s/%s.yazi/actions", BOOT.plugin_dir, YAZI_PLUGIN_NAME)
+	--result.actions_path = string.format("%s/%s.yazi/actions", BOOT.plugin_dir, YAZI_PLUGIN_NAME)
+	result.actions_path = string.format("%s/file-actions.yazi/actions", BOOT.plugin_dir)
 	return result
 end)
 
@@ -263,11 +264,15 @@ local entry = function(_, args)
 	-- 获取文件 MIME
 	local selected_mimetype_set = {}
 	-- stylua: ignore
-	local file_child = Command("file")
+	local file_child, file_err = Command("file")
 		:args({ "-bL", "--mime-type" })
 		:args(sync_state.selected_files)
 		:stdout(Command.PIPED)
 		:spawn()
+
+	if flags.debug and file_err then
+		ya.err("file_err:" .. tostring(file_err))
+	end
 
 	while true do
 		local line, event = file_child:read_line()
@@ -282,11 +287,15 @@ local entry = function(_, args)
 
 	-- 获取动作列表
 	-- stylua: ignore
-	local action_child = Command("sh")
+	local action_child, action_err = Command("sh")
 		:cwd(ya.quote(sync_state.actions_path))
 		:args({"-c","ls -d */" })
 		:stdout(Command.PIPED)
 		:spawn()
+
+	if flags.debug and action_err then
+		ya.err("action_err:" .. tostring(action_err))
+	end
 
 	local action_paths = {}
 	local action_names = {}
