@@ -4,7 +4,7 @@ local M = {}
 function M.init(_, opts)
 	local output, err = Command("which"):arg("ffmpeg"):output()
 
-	if not output.status:success() then
+	if not output.status.success then
 		ya.notify({
 			title = "FFmpeg Required ",
 			content = "FFmpeg installation needed.",
@@ -29,8 +29,8 @@ function M.init(_, opts)
 		if err ~= nil then
 			ya.err("err:" .. tostring(err))
 		else
-			ya.err("OK? :" .. tostring(output.status:success()))
-			ya.err("Code:" .. tostring(output.status:code()))
+			ya.err("OK? :" .. tostring(output.status.success))
+			ya.err("Code:" .. tostring(output.status.code))
 			ya.err("stdout:" .. output.stdout)
 			ya.err("stderr" .. output.stderr)
 		end
