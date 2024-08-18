@@ -21,7 +21,7 @@ pkg install file
 # keymap.toml
 [[manager.prepend_keymap]]
 on = [ "f" ]
-exec = "plugin file-actions --args='around '"
+run = "plugin file-actions --args='around '"
 desc= "Perform actions on selected files"
 ```
 
@@ -31,7 +31,7 @@ Or in another different style:
 [manager]
 prepend_keymap = [
 # ...
-	{ on = [ "f" ], exec = "plugin file-actions --args='around '", desc= "Perform actions on selected files"},
+	{ on = [ "f" ], run = "plugin file-actions --args='around '", desc= "Perform actions on selected files"},
 # ...
 ]
 ```

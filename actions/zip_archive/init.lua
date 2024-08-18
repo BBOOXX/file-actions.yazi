@@ -7,7 +7,7 @@ function M.init(_, opts)
 	local OS = string.gsub(tostring(output.stdout), "%s$", "")
 	if OS == "Darwin" then
 		output, err = Command("which"):arg("grealpath"):output()
-		if not output.status:success() then
+		if not output.status.success then
 			ya.notify({
 				title = "Coreutils Required ",
 				content = "You can install coreutils by running brew install coreutils in the terminal.",
@@ -64,8 +64,8 @@ function M.init(_, opts)
 		if err ~= nil then
 			ya.err("err:" .. tostring(err))
 		else
-			ya.err("OK? :" .. tostring(output.status:success()))
-			ya.err("Code:" .. tostring(output.status:code()))
+			ya.err("OK? :" .. tostring(output.status.success))
+			ya.err("Code:" .. tostring(output.status.code))
 			ya.err("stdout:" .. output.stdout)
 			ya.err("stderr" .. output.stderr)
 		end
