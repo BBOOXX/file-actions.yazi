@@ -142,7 +142,10 @@ Popup.Menu.draw_popup = ya.sync(function(state, display, height, items, cursor)
 	-- cursor : 窗口中光标的位置
 	Root.render = function(self)
 		if display then
-			return ya.list_merge(state.old_render(self), Popup.Menu.render(Popup.center_layout(self._area, height), items, cursor))
+			return ya.list_merge(
+				state.old_render(self),
+				Popup.Menu.render(Popup.center_layout(self._area, height), items, cursor)
+			)
 		end
 		return state.old_render(self)
 	end
