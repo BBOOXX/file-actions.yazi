@@ -50,7 +50,7 @@ end
 local miscellaneous = ya.sync(function(state)
 	-- 获取同步上下文
 	if state.old_render == nil then
-		state.old_render = Manager.render
+		state.old_render = Root.render
 	end
 
 	local result = {}
@@ -140,12 +140,11 @@ Popup.Menu.draw_popup = ya.sync(function(state, display, height, items, cursor)
 	-- height : 窗口高度
 	-- items : 菜单项目
 	-- cursor : 窗口中光标的位置
-	Manager.render = function(self, area)
-		local renders = { state.old_render(self, area) }
+	Root.render = function(self)
 		if display then
-			table.insert(renders, Popup.Menu.render(Popup.center_layout(area, height), items, cursor))
+			return ya.list_merge(state.old_render(self), Popup.Menu.render(Popup.center_layout(self._area, height), items, cursor))
 		end
-		return ya.flat(renders)
+		return state.old_render(self)
 	end
 	ya.render()
 end)
