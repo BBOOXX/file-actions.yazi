@@ -41,7 +41,7 @@ end
 
 function Popup.Menu:redraw()
 	--- https://github.com/sxyazi/yazi/pull/2205
-	return Popup.Menu.render(self._area, self._popup_items, self._popup_cursor)
+	return self.render(self._area, self._popup_items, self._popup_cursor)
 end
 
 function Popup.Menu:init(item_list, around, onConfirm, onCancel)
@@ -156,16 +156,15 @@ Popup.Menu.draw_popup = ya.sync(function(self, display, height, items, cursor)
 	-- height : 窗口高度
 	-- items : 菜单项目
 	-- cursor : 窗口中光标的位置
+
+	Popup.Menu._popup_height = display and height or nil
+	Popup.Menu._popup_items = display and items or nil
+	Popup.Menu._popup_cursor = display and cursor or nil
+
 	if display then
-		Popup.Menu._popup_height = height
-		Popup.Menu._popup_items = items
-		Popup.Menu._popup_cursor = cursor
-		self.children = Modal:children_add(Popup.Menu, 10)
+		self.children = self.children or Modal:children_add(Popup.Menu, 10)
 	else
 		Modal:children_remove(self.children)
-		Popup.Menu._popup_height = nil
-		Popup.Menu._popup_items = nil
-		Popup.Menu._popup_cursor = nil
 		self.children = nil
 	end
 	ya.render()
