@@ -1,20 +1,14 @@
 stds.yazi = {
 	globals = {
-		"Root",
 		"Popup",
 	},
 	read_globals = {
-		"BOOT",
-		"MANAGER",
-		"PREVIEW",
-		"THEME",
-		"Url",
-		"YAZI_PLUGIN_NAME",
+		"Modal",
+		"rt",
+		"th",
 		"cx",
-		"fs",
 		"ui",
 		"ya",
-		"Child",
 		"Command",
 	},
 }

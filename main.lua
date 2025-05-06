@@ -23,8 +23,36 @@ Popup = {
 	},
 }
 
-Popup.Menu = {}
-function Popup.Menu:new(item_list, around, onConfirm, onCancel)
+
+
+
+
+
+
+
+Popup.Menu = {
+	_id = "file-actions",
+}
+
+function Popup.Menu:new(area)
+	--- 界面入口
+	--- https://github.com/sxyazi/yazi/pull/2205
+	self._area = Popup.center_layout(area, self._popup_height)
+	return self
+end
+
+function Popup.Menu:reflow()
+	--- https://github.com/sxyazi/yazi/pull/2205
+	return {self}
+end
+
+function Popup.Menu:redraw()
+	--- https://github.com/sxyazi/yazi/pull/2205
+	return Popup.Menu.render(self._area, self._popup_items, self._popup_cursor)
+end
+
+function Popup.Menu:init(item_list, around, onConfirm, onCancel)
+	--- 初始化对象
 	local newObj = {
 		-- 设定滚动偏移量，即光标上下的保留行数
 		scroll_offset = 3,
@@ -47,12 +75,8 @@ function Popup.Menu:new(item_list, around, onConfirm, onCancel)
 	return setmetatable(newObj, self)
 end
 
-local miscellaneous = ya.sync(function(state)
-	-- 获取同步上下文
-	if state.old_render == nil then
-		state.old_render = Root.render
-	end
-
+local miscellaneous = ya.sync(function()
+	--- 杂项
 	local result = {}
 	-- 光标下的文件
 	result.cursor_files = {}
@@ -70,23 +94,23 @@ local miscellaneous = ya.sync(function(state)
 		end
 	end
 	-- 动作脚本路径
-	--result.actions_path = string.format("%s/%s.yazi/actions", BOOT.plugin_dir, YAZI_PLUGIN_NAME)
-	result.actions_path = string.format("%s/file-actions.yazi/actions", BOOT.plugin_dir)
+	result.actions_path = string.format("%s/.config/yazi/plugins/file-actions.yazi/actions", os.getenv('HOME'))
 	return result
 end)
 
 function Popup.center_layout(area, height)
 	-- 返回在 parent 区域居中的 rect
 	-- height 窗口区域高度
+	local r = rt.mgr.ratio
 	--luacheck: ignore parent_layout preview_layout
 	local parent_layout, current_layout, preview_layout = table.unpack(ui
 		.Layout()
 		-- 配置文件定义的布局
 		:direction(ui.Layout.HORIZONTAL)
 		:constraints({
-			ui.Constraint.Ratio(MANAGER.ratio.parent, MANAGER.ratio.all),
-			ui.Constraint.Ratio(MANAGER.ratio.current, MANAGER.ratio.all),
-			ui.Constraint.Ratio(MANAGER.ratio.preview, MANAGER.ratio.all),
+			ui.Constraint.Ratio(r.parent, r.all),
+			ui.Constraint.Ratio(r.current, r.all),
+			ui.Constraint.Ratio(r.preview, r.all),
 		})
 		:split(area))
 	--luacheck: ignore left_margin right_margin
@@ -121,33 +145,35 @@ function Popup.Menu.render(area, items, cursor)
 	-- cursor : 窗口中光标的位置
 	local list_items = {}
 	for i, item in ipairs(items) do
-		list_items[#list_items + 1] = ui.ListItem(item):style(i == cursor and THEME.manager.hovered or nil)
+		list_items[#list_items + 1] = ui.Line(item):style(i == cursor and th.mgr.hovered or nil)
 	end
 	return {
 		-- 清理区域
 		ui.Clear(area),
 		-- 边框
-		ui.Border(area, ui.Bar.ALL):type(ui.Border.ROUNDED):style(THEME.tasks.border),
+		ui.Border(ui.Bar.ALL):area(area):type(ui.Border.ROUNDED):style(th.mgr.border),
 		-- 列表
-		ui.List(area:padding(ui.Padding.xy(1, 1)), list_items),
+		ui.List(list_items):area(area:pad(ui.Pad.xy(1, 1))),
 	}
 end
 
-Popup.Menu.draw_popup = ya.sync(function(state, display, height, items, cursor)
+Popup.Menu.draw_popup = ya.sync(function(self, display, height, items, cursor)
 	-- 绘制窗口
-	-- state : 装着咕噜的宝贝
 	-- display : 绘制窗口吗？
 	-- height : 窗口高度
 	-- items : 菜单项目
 	-- cursor : 窗口中光标的位置
-	Root.render = function(self)
-		if display then
-			return ya.list_merge(
-				state.old_render(self),
-				Popup.Menu.render(Popup.center_layout(self._area, height), items, cursor)
-			)
-		end
-		return state.old_render(self)
+	if display then
+		Popup.Menu._popup_height = height
+		Popup.Menu._popup_items = items
+		Popup.Menu._popup_cursor = cursor
+		self.children = Modal:children_add(Popup.Menu, 10)
+	else
+		Modal:children_remove(self.children)
+		Popup.Menu._popup_height = nil
+		Popup.Menu._popup_items = nil
+		Popup.Menu._popup_cursor = nil
+		self.children = nil
 	end
 	ya.render()
 end)
@@ -242,17 +268,14 @@ function Popup.Menu:show()
 	end
 end
 
-local entry = function(_, args)
+local entry = function(_, job)
 	-- 插件参数
 	local flags = { around = false, debug = false }
-	for _, arg in pairs(args) do
-		if flags[arg] ~= nil then
-			flags[arg] = true
-		end
+	for k, v in pairs(job.args) do
+		flags[k] = v
 	end
 
 	local sync_state = miscellaneous()
-
 	-- 没选择文件 光标下也没文件
 	if #sync_state.cursor_files == 0 and #sync_state.selected_files == 0 then
 		return
@@ -372,7 +395,7 @@ local entry = function(_, args)
 		})
 	end
 
-	local menu = Popup.Menu:new(action_names, flags.around, onConfirm)
+	local menu = Popup.Menu:init(action_names, flags.around, onConfirm)
 	menu:show()
 end
 
