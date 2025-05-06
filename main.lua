@@ -23,13 +23,6 @@ Popup = {
 	},
 }
 
-
-
-
-
-
-
-
 Popup.Menu = {
 	_id = "file-actions",
 }
@@ -43,7 +36,7 @@ end
 
 function Popup.Menu:reflow()
 	--- https://github.com/sxyazi/yazi/pull/2205
-	return {self}
+	return { self }
 end
 
 function Popup.Menu:redraw()
@@ -94,7 +87,7 @@ local miscellaneous = ya.sync(function()
 		end
 	end
 	-- 动作脚本路径
-	result.actions_path = string.format("%s/.config/yazi/plugins/file-actions.yazi/actions", os.getenv('HOME'))
+	result.actions_path = string.format("%s/.config/yazi/plugins/file-actions.yazi/actions", os.getenv("HOME"))
 	return result
 end)
 
