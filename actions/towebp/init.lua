@@ -32,7 +32,7 @@ function M.init(_, opts)
 	-- stylua: ignore
 	local onCancel = function() cancel = true end
 	-- 菜单
-	local menu = Popup.Menu:new(menuOptions, opts.flags.around, onConfirm, onCancel)
+	local menu = Popup.Menu:init(menuOptions, opts.flags.around, onConfirm, onCancel)
 	menu:show()
 
 	-- stylua: ignore
