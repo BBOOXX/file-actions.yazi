@@ -282,8 +282,8 @@ local entry = function(_, job)
 	local selected_mimetype_set = {}
 	-- stylua: ignore
 	local file_child, file_err = Command("file")
-		:args({ "-bL", "--mime-type" })
-		:args(sync_state.selected_files)
+		:arg({ "-bL", "--mime-type" })
+		:arg(sync_state.selected_files)
 		:stdout(Command.PIPED)
 		:spawn()
 
@@ -306,7 +306,7 @@ local entry = function(_, job)
 	-- stylua: ignore
 	local action_child, action_err = Command("sh")
 		:cwd(ya.quote(sync_state.actions_path))
-		:args({"-c","ls -d */" })
+		:arg({"-c","ls -d */" })
 		:stdout(Command.PIPED)
 		:spawn()
 
