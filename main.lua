@@ -138,13 +138,13 @@ function Popup.Menu.render(area, items, cursor)
 	-- cursor : 窗口中光标的位置
 	local list_items = {}
 	for i, item in ipairs(items) do
-		list_items[#list_items + 1] = ui.Line(item):style(i == cursor and th.mgr.hovered or nil)
+		list_items[#list_items + 1] = ui.Line(item):style(i == cursor and th.indicator.current or nil)
 	end
 	return {
 		-- 清理区域
 		ui.Clear(area),
 		-- 边框
-		ui.Border(ui.Bar.ALL):area(area):type(ui.Border.ROUNDED):style(th.mgr.border),
+		ui.Border(ui.Edge.ALL):area(area):type(ui.Border.ROUNDED):style(th.mgr.border_style),
 		-- 列表
 		ui.List(list_items):area(area:pad(ui.Pad.xy(1, 1))),
 	}
@@ -167,7 +167,7 @@ Popup.Menu.draw_popup = ya.sync(function(self, display, height, items, cursor)
 		Modal:children_remove(self.children)
 		self.children = nil
 	end
-	ya.render()
+	ui.render()
 end)
 
 function Popup.Menu:show()
@@ -370,12 +370,10 @@ local entry = function(_, job)
 			timeout = 6.0,
 			level = "warn",
 		})
-		--ya.manager_emit("select_all", { state = "false" })
 		return
 	end
 
 	local onConfirm = function(cursor)
-		--ya.manager_emit("select_all", { state = "false" }) -- 取消选择
 		local mod = dofile(string.format("%s/%s/init.lua", sync_state.actions_path, action_paths[cursor]))
 		mod:init({
 			-- 脚本工作目录
