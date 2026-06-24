@@ -40,8 +40,8 @@ function M.init(_, opts)
 
 	quality, input_event = ya.input({
 		title = "Quality (1-100)",
-		value = quality,
-		position = {
+		value = tostring(quality),
+		pos = {
 			"top-center",
 			y = 1,
 			w = 20,
