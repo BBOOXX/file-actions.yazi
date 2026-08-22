@@ -75,14 +75,15 @@ local miscellaneous = ya.sync(function()
 	result.cursor_files = {}
 	local hovered = cx.active.current.hovered
 	-- 空文件夹时 没有光标下的文件
-	if hovered and not hovered.url.is_archive then
-		table.insert(result.cursor_files, tostring(cx.active.current.hovered.url))
+	if hovered and (hovered.url.spec.is_regular or hovered.url.spec.is_search) then
+		table.insert(result.cursor_files, tostring(hovered.url))
 	end
 
 	-- 已选择的文件
 	result.selected_files = {}
-	for _, url in pairs(cx.active.selected) do
-		if not url.is_archive then
+	for _, file in pairs(cx.active.selected) do
+		local url = file.url
+		if url.spec.is_regular or url.spec.is_search then
 			table.insert(result.selected_files, tostring(url))
 		end
 	end
@@ -95,15 +96,16 @@ function Popup.center_layout(area, height)
 	-- 返回在 parent 区域居中的 rect
 	-- height 窗口区域高度
 	local r = rt.mgr.ratio
+	local all = r[1] + r[2] + r[3]
 	--luacheck: ignore parent_layout preview_layout
 	local parent_layout, current_layout, preview_layout = table.unpack(ui
 		.Layout()
 		-- 配置文件定义的布局
 		:direction(ui.Layout.HORIZONTAL)
 		:constraints({
-			ui.Constraint.Ratio(r.parent, r.all),
-			ui.Constraint.Ratio(r.current, r.all),
-			ui.Constraint.Ratio(r.preview, r.all),
+			ui.Constraint.Ratio(r[1], all),
+			ui.Constraint.Ratio(r[2], all),
+			ui.Constraint.Ratio(r[3], all),
 		})
 		:split(area))
 	--luacheck: ignore left_margin right_margin
